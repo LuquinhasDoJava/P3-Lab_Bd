@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Reserva</title>
+</head>
+<body>
+<div>
+    <form th:action="@{/cliente/procurarQuartos}" method="get">
+
+        <div>
+            <h3>Cliente</h3>
+            <div>
+                <label>CPF: </label>
+                <input type="text" name="cpf" maxlength="11" placeholder="00000000000"
+                       pattern="[0-9]{11}" title="Digite 11 digitos" required>
+            </div>
+        </div>
+
+        <div>
+            <h3>Reserva</h3>
+            <div>
+                <label>Entrada: </label>
+                <input type="date" name="dataEntrada" required>
+            </div>
+
+            <div>
+                <label>Dias reservados: </label>
+                <input type="number" name="diasReservados" min="1" max="31" required>
+            </div>
+            <button type="submit">Procurar quartos</button>
+        </div>
+
+    </form>
+</div>
+
+<!-- Lista de quartos com botão de escolher -->
+<div th:if="${quartos != null}">
+    <h3>Quartos Disponíveis</h3>
+
+    <div th:each="quarto : ${quartos}">
+        <div style="border: 1px solid #000; margin: 10px; padding: 15px;">
+            <h4>Número: <span th:text="${quarto.numero}"></span></h4>
+            <p><strong>Andar:</strong> <span th:text="${quarto.andar}"></span></p>
+            <p><strong>Descrição:</strong> <span th:text="${quarto.descricao}"></span></p>
+            <p><strong>Tipo:</strong> <span th:text="${quarto.tipoQuarto?.nome}"></span></p>
+            <p><strong>Diaria:</strong> R$ <span th:text="${quarto.tipoQuarto?.preco}"></span></p>
+
+            <!-- Botão para escolher este quarto -->
+            <form th:action="@{/cliente/escolherQuarto}" method="post" style="display: inline;">
+                <input type="hidden" name="cpf" th:value="${cpf}">
+                <input type="hidden" name="dataEntrada" th:value="${dataEntrada}">
+                <input type="hidden" name="diasReservados" th:value="${diasReservados}">
+                <input type="hidden" name="quartoId" th:value="${quarto.codigo}">
+                <button type="submit">Escolher este</button>
+            </form>
+        </div>
+    </div>
+
+    <div th:if="${quartos.empty}">
+        <p>Nenhum quarto encontrado.</p>
+    </div>
+</div>
+
+<div th:if="${sucesso}" style="color: green;">
+    <span th:text="${sucesso}"></span>
+</div>
+
+<div th:if="${erro}" style="color: red;">
+    <span th:text="${erro}"></span>
+</div>
+
+</body>
+</html>

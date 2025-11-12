@@ -1,8 +1,3 @@
-# Read Me First
-The following was discovered as part of building this project:
-
-* The original package name 'br.edu.fateczl.hotelflex.hotel-flex' is invalid and this project uses 'br.edu.fateczl.hotelflex.hotel_flex' instead.
-
 # Getting Started
 
 ### Reference Documentation
@@ -12,7 +7,7 @@ For further reference, please consider the following sections:
 * [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/3.5.7/maven-plugin)
 * [Create an OCI image](https://docs.spring.io/spring-boot/3.5.7/maven-plugin/build-image.html)
 * [Spring Web](https://docs.spring.io/spring-boot/3.5.7/reference/web/servlet.html)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/3.5.7/reference/data/sql.html#data.sql.jpa-and-spring-data)
+* [Spring Data Elasticsearch (Access+Driver)](https://docs.spring.io/spring-boot/3.5.7/reference/data/nosql.html#data.nosql.elasticsearch)
 * [Thymeleaf](https://docs.spring.io/spring-boot/3.5.7/reference/web/servlet.html#web.servlet.spring-mvc.template-engines)
 * [Spring Boot DevTools](https://docs.spring.io/spring-boot/3.5.7/reference/using/devtools.html)
 
@@ -22,7 +17,6 @@ The following guides illustrate how to use some features concretely:
 * [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
 * [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
 * [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
 * [Handling Form Submission](https://spring.io/guides/gs/handling-form-submission/)
 
 ### Maven Parent overrides
