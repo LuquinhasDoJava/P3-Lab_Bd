@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="quartos-disponiveis"
+              pageWidth="595"
+              pageHeight="842"
+              columnWidth="555"
+              leftMargin="20"
+              rightMargin="20"
+              topMargin="20"
+              bottomMargin="20">
+
+    <parameter name="data_consulta" class="java.sql.Date"/>
+    <parameter name="titulo_relatorio" class="java.lang.String"/>
+
+    <queryString>
+        <![CDATA[
+        SELECT
+            q.codigo_quarto,
+            q.numero_quarto,
+            q.andar_quarto,
+            q.descricao,
+            tq.nome as tipo_quarto,
+            tq.preco
+        FROM quarto q
+        INNER JOIN tipo_quarto tq ON q.tipo = tq.nome
+        WHERE q.ocupado = 0
+        AND q.codigo_quarto NOT IN (
+            SELECT DISTINCT r.codigo_quarto
+            FROM reserva r
+            WHERE $P{data_consulta} BETWEEN r.data_reserva AND DATEADD(day, r.dias_reservados, r.data_reserva)
+        )
+        ORDER BY q.andar_quarto, q.numero_quarto
+        ]]>
+    </queryString>
+
+    <field name="codigo_quarto" class="java.lang.Integer"/>
+    <field name="numero_quarto" class="java.lang.Integer"/>
+    <field name="andar_quarto" class="java.lang.Integer"/>
+    <field name="descricao" class="java.lang.String"/>
+    <field name="tipo_quarto" class="java.lang.String"/>
+    <field name="preco" class="java.math.BigDecimal"/>
+
+    <title>
+        <band height="79">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="30"/>
+                <textElement textAlignment="Center">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Hotel Transilvânia]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="30" width="555" height="20"/>
+                <textElement textAlignment="Center">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Quartos Disponiveis para data]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="50" width="555" height="15"/>
+                <textElement textAlignment="Center">
+                    <font size="12"/>
+                </textElement>
+                <text><![CDATA[Data de Consulta: $P{data_consulta}]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="30">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="30" backcolor="#CCCCCC"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="0" y="0" width="50" height="30"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Andar]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="50" y="0" width="50" height="30"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Número]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="100" y="0" width="150" height="30"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Tipo]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="250" y="0" width="205" height="30"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Descrição]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="455" y="0" width="100" height="30"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Preço Diária]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="25">
+            <textField>
+                <reportElement x="0" y="0" width="50" height="25"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{andar_quarto}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="50" y="0" width="50" height="25"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{numero_quarto}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="100" y="0" width="150" height="25"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{tipo_quarto}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="250" y="0" width="205" height="25"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{descricao}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="455" y="0" width="100" height="25"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA["R$ " + $F{preco}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <summary>
+        <band height="30">
+            <textField>
+                <reportElement x="0" y="0" width="555" height="20"/>
+                <textElement textAlignment="Center">
+                    <font isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Total de quartos disponíveis: " + $V{REPORT_COUNT}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+</jasperReport>

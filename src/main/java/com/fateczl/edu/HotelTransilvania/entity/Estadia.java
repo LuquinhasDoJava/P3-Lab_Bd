@@ -43,4 +43,20 @@ public class Estadia {
     @Column(nullable = false)
     private boolean ativa;
 
+    public Estadia(Cliente cliente, Quarto quarto, Reserva reserva, LocalDate checkIn, LocalDate checkOut, boolean ativa) {
+        this.cliente = cliente;
+        this.quarto = quarto;
+        this.reserva = reserva;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.ativa = ativa;
+    }
+
+    public Estadia(Cliente cliente, Quarto quarto, LocalDate checkIn, LocalDate checkOut, boolean ativa) {
+        this.cliente = cliente;
+        this.quarto = quarto;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.ativa = ativa;
+    }
 }

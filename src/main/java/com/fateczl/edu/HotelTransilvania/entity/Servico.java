@@ -29,4 +29,9 @@ public class Servico {
     @Column(precision = 5, scale = 2)
     private BigDecimal preco;
 
+    public Servico(String nome, String descricao, BigDecimal preco) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.preco = preco;
+    }
 }

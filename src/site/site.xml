@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0
+                             http://maven.apache.org/xsd/decoration-1.8.0.xsd">
+    <bannerLeft>
+        <name>Hotel Transilvania</name>
+        <href>https://github.com/LuquinhasDoJava/P3-Lab_Bd</href>
+    </bannerLeft>
+
+    <body>
+        <menu name="Visao Geral">
+            <item name="Sobre" href="index.html"/>
+            <item name="Equipe" href="team.html"/>
+        </menu>
+
+        <menu name="Documentacao">
+            <item name="Javadoc" href="apidocs/index.html"/>
+        </menu>
+
+        <menu name="Relatorios">
+            <item name="Sumario do Projeto" href="project-info.html"/>
+            <item name="Relatorio de Testes" href="surefire-report.html"/>
+            <item name="Dependencias" href="dependencies.html"/>
+        </menu>
+
+        <menu name="Links Externos">
+            <item name="GitHub" href="https://github.com/LuquinhasDoJava/P3-Lab_Bd"/>
+            <item name="Spring Boot" href="https://spring.io/projects/spring-boot"/>
+            <item name="JasperReports" href="https://community.jaspersoft.com/project/jasperreports-library"/>
+        </menu>
+    </body>
+</project>

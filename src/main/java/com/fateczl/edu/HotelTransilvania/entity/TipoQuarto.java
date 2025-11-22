@@ -21,7 +21,7 @@ public class TipoQuarto {
     @Column(length = 30, nullable = false)
     private String nome;
 
-    @Column(length = 30, nullable = false)
+    @Column(length = 100, nullable = false)
     private String descricao;
 
     @Column(precision = 7, scale = 2, nullable = false)

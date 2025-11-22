@@ -2,7 +2,6 @@ package com.fateczl.edu.HotelTransilvania.service;
 
 import com.fateczl.edu.HotelTransilvania.entity.ServicoSolicitado;
 import com.fateczl.edu.HotelTransilvania.repository.ServicoSolicitadoRepository;
-import com.fateczl.edu.HotelTransilvania.serializable.ServicoSolicitadoId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +26,8 @@ public class ServicoSolicitadoService {
         return servicoSolicitadoRepository.findAll();
     }
 
-    public Optional<ServicoSolicitado> procurarPorId(ServicoSolicitadoId id){
-        return servicoSolicitadoRepository.findById(id);
+    public ServicoSolicitado procurarPorId(Integer id){
+        return servicoSolicitadoRepository.findById(id).orElse(null);
     }
 
 }

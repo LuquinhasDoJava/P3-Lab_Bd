@@ -26,8 +26,8 @@ public class ReservaService {
         return reservaRepository.findAll();
     }
 
-    public Optional<Reserva> procurarPorId(Integer id){
-        return reservaRepository.findById(id);
+    public Reserva procurarPorId(Integer id){
+        return reservaRepository.findById(id).orElse(null);
     }
 
 }

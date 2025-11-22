@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +15,24 @@ public class QuartoService {
     @Autowired
     private QuartoRepository quartoRepository;
 
-    public Quarto salvar(Quarto quarto){
+    public Quarto salvar(Quarto quarto) {
+        Optional<Quarto> quartoExistente = quartoRepository.findByNumeroAndAndar(quarto.getNumero(), quarto.getAndar());
+
+        if (quartoExistente.isPresent()) {
+            throw new RuntimeException("Já existe um quarto com o número " + quarto.getNumero() + " no andar " + quarto.getAndar());
+        }
+
+        return quartoRepository.save(quarto);
+    }
+
+    public Quarto atualizar(Quarto quarto) {
+        Optional<Quarto> quartoExistente = quartoRepository.findByNumeroAndAndarExcludingId(
+                quarto.getNumero(), quarto.getAndar(), quarto.getCodigo());
+
+        if (quartoExistente.isPresent()) {
+            throw new RuntimeException("Já existe um quarto com o número " + quarto.getNumero() + " no andar " + quarto.getAndar());
+        }
+
         return quartoRepository.save(quarto);
     }
 
@@ -28,17 +44,23 @@ public class QuartoService {
         return quartoRepository.findAll();
     }
 
-    public Quarto procurarPorId(Integer id){
-        return quartoRepository.findById(id).orElse(null);
+    public Optional<Quarto> procurarPorId(Integer id){
+        return quartoRepository.findById(id);
     }
 
-    public List<Quarto> procurarQuartosDisponiveisPorData(LocalDate entrada, LocalDate saida){
-        List<Quarto> quartos = new ArrayList<>();
-
-        return quartos;
+    public boolean existeQuartoComNumeroEAndar(Integer numero, Integer andar) {
+        return quartoRepository.findByNumeroAndAndar(numero, andar).isPresent();
     }
 
-    public void deletarPorId(Integer id) {
-        quartoRepository.deleteById(id);
+    public boolean existeQuartoComNumeroEAndar(Integer numero, Integer andar, Integer excluirId) {
+        return quartoRepository.findByNumeroAndAndarExcludingId(numero, andar, excluirId).isPresent();
+    }
+
+    public List<Quarto> listarQuartosDisponiveis() {
+        return quartoRepository.findByOcupadoFalse();
+    }
+
+    public List<Object[]> findQuartosDisponiveis(LocalDate dataEntrada, Integer qtd) {
+        return quartoRepository.findQuartosDisponiveis(dataEntrada, qtd);
     }
 }

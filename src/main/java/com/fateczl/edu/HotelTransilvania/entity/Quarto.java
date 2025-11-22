@@ -31,6 +31,9 @@ public class Quarto {
     @Column(length = 100, nullable = false)
     private String descricao;
 
+
+    private Boolean ocupado;
+
     public Quarto(Integer numero, Integer andar, String descricao, TipoQuarto tipoQuarto) {
         this.numero = numero;
         this.andar = andar;

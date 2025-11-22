@@ -30,4 +30,8 @@ public class EstadiaService {
         return  estadiaRepository.findById(id);
     }
 
+    public List<Estadia> listarEstadiasAtivas(){
+        return estadiaRepository.findByAtivaTrue();
+    }
+
 }

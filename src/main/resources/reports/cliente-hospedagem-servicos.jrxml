@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="cliente-hospedagem-servicos"
+              pageWidth="595"
+              pageHeight="842"
+              columnWidth="555"
+              leftMargin="20"
+              rightMargin="20"
+              topMargin="20"
+              bottomMargin="20">
+
+    <parameter name="codigo_estadia" class="java.lang.Integer"/>
+    <parameter name="titulo_relatorio" class="java.lang.String"/>
+
+    <queryString>
+        <![CDATA[
+        SELECT
+            e.codigo_estadia,
+            c.cpf,
+            c.nome as cliente_nome,
+            c.telefone,
+            c.cidade_origem,
+            q.numero_quarto,
+            q.andar_quarto,
+            tq.nome as tipo_quarto,
+            tq.preco as preco_diaria,
+            e.check_in,
+            e.check_out,
+            DATEDIFF(day, e.check_in, COALESCE(e.check_out, GETDATE())) as dias_hospedagem,
+            (DATEDIFF(day, e.check_in, COALESCE(e.check_out, GETDATE())) * tq.preco) as valor_total_hospedagem,
+            s.nome as servico_nome,
+            s.descricao as servico_descricao,
+            ss.quantidade,
+            ss.valor_pago as preco_unitario,
+            (ss.quantidade * ss.valor_pago) as valor_total_servico,
+            COALESCE(SUM(ss.quantidade * ss.valor_pago) OVER (PARTITION BY e.codigo_estadia), 0) as valor_total_servicos,
+            ((DATEDIFF(day, e.check_in, COALESCE(e.check_out, GETDATE())) * tq.preco) +
+             COALESCE(SUM(ss.quantidade * ss.valor_pago) OVER (PARTITION BY e.codigo_estadia), 0)) as valor_total_geral
+        FROM estadia e
+        INNER JOIN cliente c ON e.cliente = c.cpf
+        INNER JOIN quarto q ON e.quarto = q.codigo_quarto
+        INNER JOIN tipo_quarto tq ON q.tipo = tq.nome
+        LEFT JOIN servico_solicitado ss ON e.codigo_estadia = ss.codigo_estadia
+        LEFT JOIN servico s ON ss.codigo_servico = s.codigo_servico
+        WHERE e.codigo_estadia = $P{codigo_estadia}
+        ORDER BY s.nome
+        ]]>
+    </queryString>
+
+    <field name="codigo_estadia" class="java.lang.Integer"/>
+    <field name="cpf" class="java.lang.String"/>
+    <field name="cliente_nome" class="java.lang.String"/>
+    <field name="telefone" class="java.lang.String"/>
+    <field name="cidade_origem" class="java.lang.String"/>
+    <field name="numero_quarto" class="java.lang.Integer"/>
+    <field name="andar_quarto" class="java.lang.Integer"/>
+    <field name="tipo_quarto" class="java.lang.String"/>
+    <field name="preco_diaria" class="java.math.BigDecimal"/>
+    <field name="check_in" class="java.sql.Date"/>
+    <field name="check_out" class="java.sql.Date"/>
+    <field name="dias_hospedagem" class="java.lang.Integer"/>
+    <field name="valor_total_hospedagem" class="java.math.BigDecimal"/>
+    <field name="servico_nome" class="java.lang.String"/>
+    <field name="servico_descricao" class="java.lang.String"/>
+    <field name="quantidade" class="java.lang.Integer"/>
+    <field name="preco_unitario" class="java.math.BigDecimal"/>
+    <field name="valor_total_servico" class="java.math.BigDecimal"/>
+    <field name="valor_total_servicos" class="java.math.BigDecimal"/>
+    <field name="valor_total_geral" class="java.math.BigDecimal"/>
+
+    <variable name="servico_count" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{servico_nome} != null ? 1 : 0]]></variableExpression>
+    </variable>
+
+    <title>
+        <band height="100">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="30"/>
+                <textElement textAlignment="Center">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Hotel Transilvânia]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="30" width="555" height="20"/>
+                <textElement textAlignment="Center">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <text><![CDATA[$P{titulo_relatorio}]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="50" width="555" height="15"/>
+                <textElement textAlignment="Center">
+                    <font size="12"/>
+                </textElement>
+                <text><![CDATA[Código da Estadia: $P{codigo_estadia}]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <detail>
+        <band height="250">
+            <!-- Informações do Cliente - Só mostra na primeira linha -->
+            <printWhenExpression><![CDATA[$V{REPORT_COUNT} == 1]]></printWhenExpression>
+            <staticText>
+                <reportElement x="0" y="0" width="150" height="20" backcolor="#CCCCCC"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Informações do Cliente]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="20" width="100" height="15"/>
+                <text><![CDATA[Nome:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="100" y="20" width="455" height="15"/>
+                <textFieldExpression><![CDATA[$F{cliente_nome}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="35" width="100" height="15"/>
+                <text><![CDATA[CPF:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="100" y="35" width="455" height="15"/>
+                <textFieldExpression><![CDATA[$F{cpf}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="50" width="100" height="15"/>
+                <text><![CDATA[Telefone:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="100" y="50" width="455" height="15"/>
+                <textFieldExpression><![CDATA[$F{telefone}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="65" width="100" height="15"/>
+                <text><![CDATA[Cidade Origem:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="100" y="65" width="455" height="15"/>
+                <textFieldExpression><![CDATA[$F{cidade_origem}]]></textFieldExpression>
+            </textField>
+
+            <!-- Informações da Hospedagem - Só mostra na primeira linha -->
+            <staticText>
+                <reportElement x="0" y="85" width="150" height="20" backcolor="#CCCCCC"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Informações da Hospedagem]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="105" width="100" height="15"/>
+                <text><![CDATA[Quarto:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="100" y="105" width="455" height="15"/>
+                <textFieldExpression><![CDATA["Andar " + $F{andar_quarto} + " - Nº " + $F{numero_quarto} + " (" + $F{tipo_quarto} + ")"]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="120" width="100" height="15"/>
+                <text><![CDATA[Check-in:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="100" y="120" width="455" height="15"/>
+                <textFieldExpression><![CDATA[$F{check_in}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="135" width="100" height="15"/>
+                <text><![CDATA[Check-out:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="100" y="135" width="455" height="15"/>
+                <textFieldExpression><![CDATA[$F{check_out} == null ? "Em andamento" : $F{check_out}]]></textFieldExpression>
+            </textField>
+
+            <!-- Resumo Financeiro - Só mostra na primeira linha -->
+            <staticText>
+                <reportElement x="0" y="160" width="150" height="20" backcolor="#CCCCCC"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Resumo Financeiro]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="180" width="200" height="15"/>
+                <text><![CDATA[Dias de Hospedagem:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="200" y="180" width="355" height="15"/>
+                <textFieldExpression><![CDATA[$F{dias_hospedagem} + " dias"]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="195" width="200" height="15"/>
+                <text><![CDATA[Valor Total Hospedagem:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="200" y="195" width="355" height="15"/>
+                <textFieldExpression><![CDATA["R$ " + $F{valor_total_hospedagem}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="210" width="200" height="15"/>
+                <text><![CDATA[Valor Total Serviços:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="200" y="210" width="355" height="15"/>
+                <textFieldExpression><![CDATA["R$ " + $F{valor_total_servicos}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="225" width="200" height="20"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[VALOR TOTAL GERAL:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="200" y="225" width="355" height="20"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["R$ " + $F{valor_total_geral}]]></textFieldExpression>
+            </textField>
+        </band>
+
+        <!-- Serviços Consumidos - Cabeçalho só mostra se houver serviços -->
+        <band height="30">
+            <printWhenExpression><![CDATA[$V{REPORT_COUNT} == 1 && $F{servico_nome} != null]]></printWhenExpression>
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="20" backcolor="#CCCCCC"/>
+                <textElement textAlignment="Center">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Serviços Consumidos]]></text>
+            </staticText>
+        </band>
+
+        <!-- Lista de Serviços - Só mostra linhas que têm serviços -->
+        <band height="25">
+            <printWhenExpression><![CDATA[$F{servico_nome} != null]]></printWhenExpression>
+            <textField>
+                <reportElement x="0" y="0" width="150" height="25"/>
+                <textElement verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{servico_nome}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="150" y="0" width="200" height="25"/>
+                <textElement verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{servico_descricao}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="350" y="0" width="50" height="25"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{quantidade}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="400" y="0" width="75" height="25"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA["R$ " + $F{preco_unitario}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="475" y="0" width="80" height="25"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA["R$ " + $F{valor_total_servico}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <summary>
+        <band height="30">
+            <textField>
+                <reportElement x="0" y="0" width="555" height="20"/>
+                <textElement textAlignment="Center">
+                    <font isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Total de serviços consumidos: " + $V{servico_count}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+</jasperReport>

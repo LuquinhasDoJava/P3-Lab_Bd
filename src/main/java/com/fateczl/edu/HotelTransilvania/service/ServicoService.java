@@ -26,8 +26,8 @@ public class ServicoService {
         return servicoRepository.findAll();
     }
 
-    public Optional<Servico> procurarPorId(Integer id){
-        return servicoRepository.findById(id);
+    public Servico procurarPorId(Integer id){
+        return servicoRepository.findById(id).orElse(null);
     }
 
 }

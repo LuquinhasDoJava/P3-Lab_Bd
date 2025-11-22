@@ -1,20 +1,12 @@
 package com.fateczl.edu.HotelTransilvania.controller;
 
 import com.fateczl.edu.HotelTransilvania.entity.Cliente;
-import com.fateczl.edu.HotelTransilvania.entity.Quarto;
-import com.fateczl.edu.HotelTransilvania.entity.Reserva;
 import com.fateczl.edu.HotelTransilvania.service.ClienteService;
 import com.fateczl.edu.HotelTransilvania.service.QuartoService;
-import com.fateczl.edu.HotelTransilvania.service.ReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.time.LocalDate;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/cliente")
@@ -26,71 +18,72 @@ public class ClienteController {
     @Autowired
     private QuartoService quartoService;
 
-    @Autowired
-    private ReservaService reservaService;
-
     @GetMapping
-    public String telaInicia(){
-        return "/cliente/telaInicial";
+    public String telaInicial(Model model){
+        model.addAttribute("cliente",new Cliente());
+        model.addAttribute("clientes", clienteService.listarTodos());
+        return "/cliente/manterCliente";
     }
 
-    @GetMapping("/reserva")
-    public String telaReserva(){
-        return "/cliente/cadastroReserva";
-    }
-
-    @GetMapping("/cadastroCliente")
-    public String cadastroCliente(@ModelAttribute Cliente cliente, Model model){
+    @GetMapping("/salvar")
+    public String salvarCliente(@RequestParam String cpf,
+                                @RequestParam String nome,
+                                @RequestParam String telefone,
+                                @RequestParam String cidadeOrigem,
+                                Model model){
         try{
-            clienteService.salvar(cliente);
-            model.addAttribute("sucesso","Cliente cadastrado com sucesso!!");
-            model.addAttribute("cliente", new Cliente());
+            Cliente clienteExistente = clienteService.procurarPorId(cpf);
+            if(clienteExistente == null){
+                clienteService.salvar(new Cliente(cpf,nome,telefone,cidadeOrigem));
+                model.addAttribute("sucesso","Cliente cadastrado com sucesso!!");
+            } else {
+                clienteExistente.setCidadeOrigem(cidadeOrigem);
+                clienteExistente.setNome(nome);
+                clienteExistente.setTelefone(telefone);
+                clienteService.salvar(clienteExistente);
+                model.addAttribute("sucesso","Cliente atualizado com sucesso!!");
+            }
         } catch (Exception e) {
-            model.addAttribute("erro", "Erro ao cadastrar cliente: " + e.getMessage());
+            model.addAttribute("erro","Erro ao salvar cliente: " + e.getMessage());
         }
-        return "/cliente/cadastroCliente";
+        model.addAttribute("cliente",new Cliente());
+        model.addAttribute("clientes",clienteService.listarTodos());
+        return "/cliente/manterCliente";
     }
 
-    @GetMapping("/procurarQuartos")
-    public String procurarQuartosDisponiveis(@RequestParam String dataEntrada,
-                                             @RequestParam Integer diasReservados,
-                                             @RequestParam String cpf, Model model){
-        Cliente cliente = clienteService.procurarPorId(cpf);
-        if(cliente != null ){
-            model.addAttribute("sucesso","Cliente foi encontrado!");
-            model.addAttribute("quartos",quartoService.listarTodos());
-            return "/cliente/cadastroReserva";
-        }
-        model.addAttribute("erro","Cliente não encontrado!");
-        model.addAttribute("quartos", null);
-        return "/cliente/cadastroReserva";
-    }
-
-    @GetMapping("/escolherQuarto")
-    public String escolherQuarto(@RequestParam String cpf,
-                                 @RequestParam String dataEntrada,
-                                 @RequestParam Integer diasReservados,
-                                 @RequestParam Integer quartoId, Model model){
+    @GetMapping("/editar/{id}")
+    public String editarCliente(@PathVariable String cpf, Model model){
         try {
             Cliente cliente = clienteService.procurarPorId(cpf);
-            if( cliente == null){
-                model.addAttribute("erro","Cliente não encontrado!!");
-                return "/cliente/cadastroReserva";
+            if(cliente != null){
+                model.addAttribute("sucesso","Cliente encontrado com sucesso!!");
+                model.addAttribute("cliente", cliente);
+            } else {
+                model.addAttribute("cliente",new Cliente());
+                model.addAttribute("erro","Cliente não econtrado!!");
             }
-            Quarto quarto = quartoService.procurarPorId(quartoId);
-
-            Reserva reserva = new Reserva(cliente,quarto, LocalDate.parse(dataEntrada),diasReservados);
-
-            reservaService.salvar(reserva);
-
-            model.addAttribute("sucesso","Reserva realizada com sucesso!!");
-            model.addAttribute("cpf", cpf);
-            model.addAttribute("dataEntrada", dataEntrada);
-            model.addAttribute("diasReservados", diasReservados);
         } catch (Exception e) {
-            model.addAttribute("erro", "Erro ao escolher quarto e salvar Reserva!" + e.getMessage());
+            model.addAttribute("erro","Erro ao editar cliente: " + e.getMessage());
         }
-        return "/cliente/cadastroReserva";
+        model.addAttribute("clientes", clienteService.listarTodos());
+        return "/cliente/manterCliente";
     }
 
+    @PostMapping("/excluir/{cpf}")
+    public String excluirCliente(@PathVariable String cpf, Model model){
+        try {
+            Cliente cliente = clienteService.procurarPorId(cpf);
+            if(cliente != null){
+                clienteService.deletar(cliente);
+                model.addAttribute("sucesso","Cliente excluido com sucesso!!");
+            } else {
+                model.addAttribute("erro","Cliente não encontrado!!");
+            }
+        } catch (Exception e){
+            model.addAttribute("erro","Erro ao excluir cliente: " + e.getMessage());
+        }
+        model.addAttribute("cliente", new Cliente());
+        model.addAttribute("clientes", clienteService.listarTodos());
+        return "/cliente/manterCliente";
+    }
 }
